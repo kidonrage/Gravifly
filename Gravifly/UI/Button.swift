@@ -9,24 +9,29 @@
 import Foundation
 import SpriteKit
 
-class Button: SKNode {
+class Button: SKSpriteNode {
     
     init(labelText: String, nodeName: String) {
-        super.init()
-        
         let buttonTexture = SKTexture(imageNamed: "button")
         buttonTexture.filteringMode = .nearest
-        let buttonNode = SKSpriteNode(texture: buttonTexture)
-        buttonNode.setScale(10)
-        buttonNode.zPosition = 1
-        buttonNode.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        addChild(buttonNode)
+        
+        super.init(
+            texture: buttonTexture,
+            color: .clear,
+            size: CGSize(
+                width: buttonTexture.size().width * 10,
+                height: buttonTexture.size().height * 10
+            )
+        )
+        
+        self.name = nodeName
+        self.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         
         let buttonLabel = SKLabelNode(fontNamed: "UnrealEngine")
+        buttonLabel.name = nodeName
         buttonLabel.verticalAlignmentMode = .center
         buttonLabel.horizontalAlignmentMode = .center
-        buttonLabel.name = "start-button"
-        buttonLabel.text = "START"
+        buttonLabel.text = labelText
         buttonLabel.fontSize = 120
         buttonLabel.position.y += 10
         buttonLabel.fontColor = .white
