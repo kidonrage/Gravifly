@@ -20,6 +20,7 @@
 		E138D63023310837005E4DEA /* HelpFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E138D62F23310837005E4DEA /* HelpFunctions.swift */; };
 		E192103423F27894005525E3 /* 18523.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E192103323F27894005525E3 /* 18523.ttf */; };
 		E192103623F27B44005525E3 /* GameOverScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = E192103523F27B44005525E3 /* GameOverScene.swift */; };
+		E192103823F28002005525E3 /* MainMenuScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = E192103723F28002005525E3 /* MainMenuScene.swift */; };
 		E1A6B3B4232CE08F000C210E /* PlayerRunning.atlas in Resources */ = {isa = PBXBuildFile; fileRef = E1A6B3B3232CE08F000C210E /* PlayerRunning.atlas */; };
 		E1A6B3B6232CE3B3000C210E /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A6B3B5232CE3B3000C210E /* Player.swift */; };
 		E1A6B3BA232CEF87000C210E /* Background.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A6B3B9232CEF87000C210E /* Background.swift */; };
@@ -47,6 +48,7 @@
 		E138D62F23310837005E4DEA /* HelpFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpFunctions.swift; sourceTree = "<group>"; };
 		E192103323F27894005525E3 /* 18523.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = 18523.ttf; sourceTree = "<group>"; };
 		E192103523F27B44005525E3 /* GameOverScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameOverScene.swift; sourceTree = "<group>"; };
+		E192103723F28002005525E3 /* MainMenuScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenuScene.swift; sourceTree = "<group>"; };
 		E1A6B3B3232CE08F000C210E /* PlayerRunning.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; name = PlayerRunning.atlas; path = Gravifly/Player/PlayerRunning.atlas; sourceTree = SOURCE_ROOT; };
 		E1A6B3B5232CE3B3000C210E /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		E1A6B3B9232CEF87000C210E /* Background.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Background.swift; sourceTree = "<group>"; };
@@ -103,6 +105,7 @@
 				E1A6B3C4232DF5E4000C210E /* Player */,
 				E12FAA58231CFCC9007B24F6 /* AppDelegate.swift */,
 				E12FAA5E231CFCC9007B24F6 /* GameScene.swift */,
+				E192103723F28002005525E3 /* MainMenuScene.swift */,
 				E192103523F27B44005525E3 /* GameOverScene.swift */,
 				E12FAA60231CFCC9007B24F6 /* GameViewController.swift */,
 				E1A6B3B9232CEF87000C210E /* Background.swift */,
@@ -233,6 +236,7 @@
 				E138D62E23310771005E4DEA /* Shot.swift in Sources */,
 				E12FAA59231CFCC9007B24F6 /* AppDelegate.swift in Sources */,
 				E1A6B3C0232D1DC8000C210E /* CGFloat+Utils.swift in Sources */,
+				E192103823F28002005525E3 /* MainMenuScene.swift in Sources */,
 				E138D63023310837005E4DEA /* HelpFunctions.swift in Sources */,
 				E1A6B3C2232D2448000C210E /* CGPoint+Utils.swift in Sources */,
 				E1A6B3BA232CEF87000C210E /* Background.swift in Sources */,

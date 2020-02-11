@@ -36,6 +36,7 @@ class GameScene: SKScene {
     }
     var lives = 3
     var gameOver = false
+    var isPlayerInvincible = false
     
     let scoreLabel = SKLabelNode()
     
@@ -312,7 +313,30 @@ class GameScene: SKScene {
         if lives <= 0 && !gameOver {
             gameOver = true
             print("You lose!")
-            pause()
+            let gameOverScene = GameOverScene(size: size)
+            gameOverScene.scaleMode = scaleMode
+            
+            let reveal = SKTransition.flipHorizontal(withDuration: 0.5)
+            
+            view?.presentScene(gameOverScene, transition: reveal)
+        } else {
+            isPlayerInvincible = true
+            
+            let blinkTimes = 16.0
+            let duration = 3.0
+            let blinkAction = SKAction.customAction(
+            withDuration: duration) { node, elapsedTime in
+                let slice = duration / blinkTimes
+                let remainder = Double(elapsedTime).truncatingRemainder(
+                    dividingBy: slice)
+                node.isHidden = remainder > slice / 2
+            }
+            let godModeOff = SKAction.run { [weak self] in
+                self?.isPlayerInvincible = false
+                self?.player.isHidden = false
+            }
+            
+            player.run(SKAction.sequence([blinkAction, godModeOff]))
         }
     }
     
@@ -321,7 +345,7 @@ class GameScene: SKScene {
         enumerateChildNodes(withName: "enemyDrone") { (node, _) in
             let drone = node as! SKSpriteNode
             
-            if (drone.frame.insetBy(dx: 40, dy: 40).intersects(self.player.frame)) {
+            if (!self.isPlayerInvincible && drone.frame.insetBy(dx: 40, dy: 40).intersects(self.player.frame)) {
                 self.getDamage()
             }
             
