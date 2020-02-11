@@ -21,6 +21,7 @@
 		E192103423F27894005525E3 /* 18523.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E192103323F27894005525E3 /* 18523.ttf */; };
 		E192103623F27B44005525E3 /* GameOverScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = E192103523F27B44005525E3 /* GameOverScene.swift */; };
 		E192103823F28002005525E3 /* MainMenuScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = E192103723F28002005525E3 /* MainMenuScene.swift */; };
+		E192103B23F2AB71005525E3 /* Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = E192103A23F2AB71005525E3 /* Button.swift */; };
 		E1A6B3B4232CE08F000C210E /* PlayerRunning.atlas in Resources */ = {isa = PBXBuildFile; fileRef = E1A6B3B3232CE08F000C210E /* PlayerRunning.atlas */; };
 		E1A6B3B6232CE3B3000C210E /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A6B3B5232CE3B3000C210E /* Player.swift */; };
 		E1A6B3BA232CEF87000C210E /* Background.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A6B3B9232CEF87000C210E /* Background.swift */; };
@@ -49,6 +50,7 @@
 		E192103323F27894005525E3 /* 18523.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = 18523.ttf; sourceTree = "<group>"; };
 		E192103523F27B44005525E3 /* GameOverScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameOverScene.swift; sourceTree = "<group>"; };
 		E192103723F28002005525E3 /* MainMenuScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenuScene.swift; sourceTree = "<group>"; };
+		E192103A23F2AB71005525E3 /* Button.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Button.swift; sourceTree = "<group>"; };
 		E1A6B3B3232CE08F000C210E /* PlayerRunning.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; name = PlayerRunning.atlas; path = Gravifly/Player/PlayerRunning.atlas; sourceTree = SOURCE_ROOT; };
 		E1A6B3B5232CE3B3000C210E /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		E1A6B3B9232CEF87000C210E /* Background.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Background.swift; sourceTree = "<group>"; };
@@ -98,6 +100,7 @@
 		E12FAA57231CFCC8007B24F6 /* Gravifly */ = {
 			isa = PBXGroup;
 			children = (
+				E192103923F2AB57005525E3 /* UI */,
 				E192103323F27894005525E3 /* 18523.ttf */,
 				E12BC30F2338507B004AB54E /* Buildings.atlas */,
 				E11620372332584C00D3D11C /* EnemyDrone */,
@@ -126,6 +129,14 @@
 				E138D62D23310771005E4DEA /* Shot.swift */,
 			);
 			path = Shot;
+			sourceTree = "<group>";
+		};
+		E192103923F2AB57005525E3 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				E192103A23F2AB71005525E3 /* Button.swift */,
+			);
+			path = UI;
 			sourceTree = "<group>";
 		};
 		E1A6B3C3232D2601000C210E /* Utils */ = {
@@ -240,6 +251,7 @@
 				E138D63023310837005E4DEA /* HelpFunctions.swift in Sources */,
 				E1A6B3C2232D2448000C210E /* CGPoint+Utils.swift in Sources */,
 				E1A6B3BA232CEF87000C210E /* Background.swift in Sources */,
+				E192103B23F2AB71005525E3 /* Button.swift in Sources */,
 				E11620392332589500D3D11C /* EnemyDrone.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

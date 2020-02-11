@@ -32,41 +32,21 @@ class MainMenuScene: SKScene {
     }
     
     private func addStartButton() {
-        let buttonRoot = SKNode()
+        let startButton = Button(labelText: "START", nodeName: "start-button")
         
-        let buttonTexture = SKTexture(imageNamed: "button")
-        buttonTexture.filteringMode = .nearest
-        let buttonNode = SKSpriteNode(texture: buttonTexture)
-        buttonNode.setScale(10)
-        buttonNode.zPosition = 1
-        buttonNode.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        buttonRoot.addChild(buttonNode)
-        
-        let buttonLabel = SKLabelNode(fontNamed: "UnrealEngine")
-        buttonLabel.verticalAlignmentMode = .center
-        buttonLabel.horizontalAlignmentMode = .center
-        buttonLabel.name = "start-button"
-        buttonLabel.text = "START"
-        buttonLabel.fontSize = 120
-        buttonLabel.position.y += 10
-        buttonLabel.fontColor = .white
-        buttonLabel.zPosition = 10
-        
-        buttonRoot.addChild(buttonLabel)
-        
-        buttonRoot.position = CGPoint(
+        startButton.position = CGPoint(
             x: size.width / 2,
             y: size.height / 2 - 300
         )
+        
+        addChild(startButton)
         
         let moveDown = SKAction.moveBy(x: 0, y: -10, duration: 0.3)
         let moveUp = SKAction.moveBy(x: 0, y: 20, duration: 0.8)
         
         let animationAction = SKAction.sequence([moveDown, moveUp, moveDown])
         
-        addChild(buttonRoot)
-        
-        buttonRoot.run(SKAction.repeatForever(animationAction))
+        startButton.run(SKAction.repeatForever(animationAction))
     }
     
     private func addBackground() {
