@@ -11,79 +11,397 @@ import GameplayKit
 
 class GameScene: SKScene {
     
-    private var label : SKLabelNode?
-    private var spinnyNode : SKShapeNode?
+    var lastUpdateTime: TimeInterval = 0
+    var dt: TimeInterval = 0
+    
+    let playableRect: CGRect
+    var gameTimer: Timer?
+    
+    let cameraNode = SKCameraNode()
+    var cameraRect : CGRect {
+        let x = cameraNode.position.x - size.width/2 + (size.width - playableRect.width)/2
+        let y = cameraNode.position.y - size.height/2 + (size.height - playableRect.height)/2
+        return CGRect(
+            x: x,
+            y: y,
+            width: playableRect.width,
+            height: playableRect.height
+        )
+    }
+    
+    var score = 0 {
+        didSet {
+            scoreLabel.text = "Score: \(score)"
+        }
+    }
+    var lives = 3
+    var gameOver = false
+    
+    let scoreLabel = SKLabelNode()
+    
+    let backgroundNodeScrollTime: TimeInterval = 6
+    
+    let player = Player()
+    var playerMovePointsPerSec: CGFloat = 600.0 {
+        didSet {
+            removeAllActions()
+            startSpawning()
+        }
+    }
+    var velocity = CGPoint.zero
+    
+    override init(size: CGSize) {
+        let maxAspectRatio: CGFloat = 2.16
+        let playableHeight = size.width / maxAspectRatio
+        let playableMargin = (size.height - playableHeight) / 2.0
+        playableRect = CGRect(x: 0, y: playableMargin, width: size.width, height: playableHeight)
+        super.init(size: size)
+        gameTimer = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { timer in
+            self.playerMovePointsPerSec += 10
+        }
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func didMove(to view: SKView) {
+        backgroundColor = SKColor.black
         
-        // Get label node from scene and store it for use later
-        self.label = self.childNode(withName: "//helloLabel") as? SKLabelNode
-        if let label = self.label {
-            label.alpha = 0.0
-            label.run(SKAction.fadeIn(withDuration: 2.0))
-        }
+        createRoof()
+        createBackground()
         
-        // Create shape node to use during mouse interaction
-        let w = (self.size.width + self.size.height) * 0.05
-        self.spinnyNode = SKShapeNode.init(rectOf: CGSize.init(width: w, height: w), cornerRadius: w * 0.3)
+        let swipeUp = UISwipeGestureRecognizer(target: self, action: #selector(swipeUpHandler))
+        swipeUp.direction = .up
+        view.addGestureRecognizer(swipeUp)
         
-        if let spinnyNode = self.spinnyNode {
-            spinnyNode.lineWidth = 2.5
+        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tapHandler))
+        view.addGestureRecognizer(tapRecognizer)
+        
+        player.position = CGPoint(x: 300, y: playableRect.minY + player.size.height / 2)
+        player.zPosition = 1
+        addChild(player)
+        player.startRunning()
+        
+        startSpawning()
+        
+        setupUI()
+        
+        addChild(cameraNode)
+        camera = cameraNode
+        cameraNode.position = CGPoint(x: size.width/2, y: size.height/2)
+    }
+    
+    private func startSpawning() {
+        run(SKAction.repeatForever(
+            SKAction.sequence([
+                SKAction.wait(forDuration: TimeInterval(1200.0 / playerMovePointsPerSec)),
+                SKAction.run { [weak self] in
+                    self?.createBackgroundBuildings()
+                }
+            ])
+        ))
+        
+        run(SKAction.repeatForever(
+            SKAction.sequence([
+                SKAction.wait(forDuration: TimeInterval(1200.0 / playerMovePointsPerSec)),
+                SKAction.run { [weak self] in
+                    self?.createForegroundBuildings()
+                }
+            ])
+        ))
+        
+        run(SKAction.repeatForever(
+            SKAction.sequence([
+                SKAction.wait(forDuration: TimeInterval(2400.0 / playerMovePointsPerSec)),
+                SKAction.run() { [weak self] in
+                    self?.spawnDrone()
+                }
+            ])
+        ))
+    }
+    
+    private func setupUI() {
+        scoreLabel.text = "Score: \(score)"
+        scoreLabel.fontName = "UnrealEngine"
+        scoreLabel.fontSize = 64
+        scoreLabel.fontColor = .white
+        scoreLabel.position = CGPoint(
+            x: cameraRect.maxX - scoreLabel.frame.width / 2 - 30,
+            y: cameraRect.maxY - 30)
+        
+        cameraNode.addChild(scoreLabel)
+        scoreLabel.zPosition = 100
+    }
+    
+    func move(sprite: SKSpriteNode, velocity: CGPoint) {
+        let amountToMove = CGPoint(
+            x: velocity.x * CGFloat(dt),
+            y: velocity.y * CGFloat(dt)
+        )
+        
+        sprite.position = CGPoint(
+            x: sprite.position.x + amountToMove.x,
+            y: sprite.position.y + amountToMove.y
+        )
+    }
+    
+    func spawnDrone() {
+        let drone = EnemyDrone()
+        
+        drone.position = CGPoint(
+            x: cameraRect.maxX + drone.size.width / 2,
+            y: CGFloat.random(
+                min: cameraRect.minY + drone.size.height / 2,
+                max: cameraRect.maxY - 200 - drone.size.height / 2))
+        drone.zPosition = player.zPosition
+        addChild(drone)
+        
+        let amountToMove = frame.size.width + drone.size.width
+        
+        let minTime = TimeInterval(amountToMove / (playerMovePointsPerSec))
+        let maxTime = TimeInterval(amountToMove / (playerMovePointsPerSec - 200))
+        
+        let actionMove = SKAction.moveBy(x: -amountToMove, y: 0, duration: TimeInterval.random(in: minTime...maxTime))
+        let actionRemove = SKAction.removeFromParent()
+        
+        drone.run(SKAction.sequence([actionMove, actionRemove]))
+    }
+    
+    
+    func shotHit(enemy: SKSpriteNode) {
+        score += 1
+        playerMovePointsPerSec += 100
+        
+        let explosionFrames = getFramesFromAtlas(atlasName: "EnemyExplosion", singleTextureName: "enemy-explosion")
+        let explode = getAnimationAction(with: explosionFrames)
+        let disappear = SKAction.removeFromParent()
+        
+        enemy.run(SKAction.sequence([explode, disappear]))
+    }
+    
+    func createRoof() {
+        let roofTexture = SKTexture(imageNamed: "roof")
+        let roofDecorTexture = SKTexture(imageNamed: "roof-decor")
+        
+        for i in 0...1 {
+            let roof = SKSpriteNode(texture: roofTexture)
+            roof.name = "roof"
             
-            spinnyNode.run(SKAction.repeatForever(SKAction.rotate(byAngle: CGFloat(Double.pi), duration: 1)))
-            spinnyNode.run(SKAction.sequence([SKAction.wait(forDuration: 0.5),
-                                              SKAction.fadeOut(withDuration: 0.5),
-                                              SKAction.removeFromParent()]))
+            let roofDecor = SKSpriteNode(texture: roofDecorTexture)
+            roofDecor.anchorPoint = .zero
+            roofDecor.position = CGPoint(x: 0, y: roofTexture.size().height)
+            roof.addChild(roofDecor)
+            
+            roof.anchorPoint = CGPoint(
+                x: 0,
+                y: 0
+            )
+            roof.zPosition = 1
+            roof.position = CGPoint(
+                x: roof.size.width * CGFloat(i),
+                y: playableRect.minY - roofTexture.size().height
+            )
+            addChild(roof)
+            
+            let moveLeft = SKAction.moveBy(x: -playerMovePointsPerSec, y: 0, duration: 1.0)
+            roof.run(SKAction.repeatForever(moveLeft))
         }
     }
     
-    
-    func touchDown(atPoint pos : CGPoint) {
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = pos
-            n.strokeColor = SKColor.green
-            self.addChild(n)
+    func createBackground() {
+        let backgroundMovePerSecond: CGFloat = 80.0
+        for i in 1...2 {
+            let background = SKSpriteNode(imageNamed: "background\(i)")
+            background.name = "background"
+            background.anchorPoint = .zero
+            background.position = CGPoint(
+                x: background.size.width * CGFloat(i - 1),
+                y: 0)
+            background.zPosition = -30
+            addChild(background)
+            
+            let moveLeft = SKAction.moveBy(x: -backgroundMovePerSecond, y: 0, duration: 1.0)
+            background.run(SKAction.repeatForever(moveLeft))
         }
     }
     
-    func touchMoved(toPoint pos : CGPoint) {
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = pos
-            n.strokeColor = SKColor.blue
-            self.addChild(n)
-        }
-    }
-    
-    func touchUp(atPoint pos : CGPoint) {
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = pos
-            n.strokeColor = SKColor.red
-            self.addChild(n)
-        }
-    }
-    
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if let label = self.label {
-            label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
+    func createBackgroundBuildings() {
+        let backgroundBuildingMovePerSecond: CGFloat = 160.0
+        
+        let backgroundBuildingTexture = SKTexture(imageNamed: "background-building")
+        let building = SKSpriteNode(texture: backgroundBuildingTexture)
+        
+        building.name = "building"
+        building.anchorPoint = CGPoint.zero
+        building.zPosition = -20
+        
+        let moveLeft = SKAction.moveBy(x: -backgroundBuildingMovePerSecond, y: 0, duration: 1.0)
+        
+        let wait = SKAction.wait(forDuration: TimeInterval.random(in: 0.0...TimeInterval(600.0 / playerMovePointsPerSec)))
+        let add = SKAction.run { [weak self] in
+            self?.addChild(building)
+            print("Added")
+            building.position = CGPoint(
+                x: self?.cameraRect.maxX ?? 0,
+                y: self?.cameraRect.minY ?? 0
+            )
+            building.run(SKAction.repeatForever(moveLeft))
         }
         
-        for t in touches { self.touchDown(atPoint: t.location(in: self)) }
+        run(SKAction.sequence([wait, add]))
     }
     
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchMoved(toPoint: t.location(in: self)) }
+    func createForegroundBuildings() {
+        let foregroundBuildingMovePerSecond: CGFloat = 300.0
+        
+        let buildingTextures = getFramesFromAtlas(atlasName: "Buildings", singleTextureName: "building")
+        let currentTextureIndex = Int.random(in: 0..<buildingTextures.count)
+        let building = SKSpriteNode(texture: buildingTextures[currentTextureIndex])
+        
+        building.name = "building"
+        building.anchorPoint = .zero
+        building.zPosition = -10
+        
+        let moveLeft = SKAction.moveBy(x: -foregroundBuildingMovePerSecond, y: 0, duration: 1.0)
+        
+        let wait = SKAction.wait(forDuration: TimeInterval.random(in: 0.0...TimeInterval(1200.0 / playerMovePointsPerSec)))
+        let add = SKAction.run { [weak self] in
+            self?.addChild(building)
+            print("Added")
+            building.position = CGPoint(
+                x: self?.cameraRect.maxX ?? 0,
+                y: self?.cameraRect.minY ?? 0
+            )
+            building.run(SKAction.repeatForever(moveLeft))
+        }
+        
+        run(SKAction.sequence([wait, add]))
     }
     
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
+    @objc func swipeUpHandler() {
+        player.jump()
     }
     
-    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
+    @objc func tapHandler() {
+        player.startShooting()
+        
+        let shot = Shot();
+        let position = CGPoint(
+            x: player.size.width / 2,
+            y: 10
+        )
+        shot.position = player.convert(position, to: self)
+        shot.zPosition = player.zPosition
+        addChild(shot)
+        
+        let moveLeft = SKAction.moveBy(x: playerMovePointsPerSec + 1000, y: 0, duration: 1.0)
+        shot.run(SKAction.repeatForever(moveLeft))
     }
     
+    func debugDrawPlayableArea() {
+        let shape = SKShapeNode(rect: playableRect)
+        shape.strokeColor = SKColor.blue
+        shape.lineWidth = 4.0
+        addChild(shape)
+    }
+    
+    func getDamage() {
+        lives -= 1
+        
+        if lives <= 0 && !gameOver {
+            gameOver = true
+            print("You lose!")
+            pause()
+        }
+    }
+    
+    func checkCollisions() {
+        var hitDrones: [SKSpriteNode] = []
+        enumerateChildNodes(withName: "enemyDrone") { (node, _) in
+            let drone = node as! SKSpriteNode
+            
+            if (drone.frame.insetBy(dx: 40, dy: 40).intersects(self.player.frame)) {
+                self.getDamage()
+            }
+            
+            self.enumerateChildNodes(withName: "shot", using: { (shot, _) in
+                if (drone.frame.intersects(shot.frame)) {
+                    hitDrones.append(drone)
+                    drone.name = ""
+                    shot.removeFromParent()
+                }
+            })
+        }
+        
+        for drone in hitDrones {
+            shotHit(enemy: drone)
+        }
+        
+    }
+    
+    func moveCamera() {
+        let cameraVelocity = CGPoint(x: playerMovePointsPerSec, y: 0)
+        
+        let amountToMove = CGPoint(
+            x: cameraVelocity.x * CGFloat(dt),
+            y: cameraVelocity.y * CGFloat(dt)
+        )
+        
+        cameraNode.position = CGPoint(
+            x: cameraNode.position.x + amountToMove.x,
+            y: cameraNode.position.y + amountToMove.y
+        )
+        
+        respawnInvisibleNodes(withName: "roof")
+        respawnInvisibleNodes(withName: "background")
+        
+        clearInvisibleNodes(withName: "building")
+        
+        enumerateChildNodes(withName: "shot") { node, _ in
+            let shot = node as! SKSpriteNode
+            
+            if shot.position.x + shot.size.width > self.cameraRect.maxX {
+                shot.removeFromParent()
+            }
+        }
+    }
+    
+    func respawnInvisibleNodes(withName nodeName: String) {
+        enumerateChildNodes(withName: nodeName) { node, _ in
+            let invisibleNode = node as! SKSpriteNode
+            
+            if invisibleNode.position.x + invisibleNode.size.width < self.cameraRect.origin.x {
+                invisibleNode.position = CGPoint(
+                    x: invisibleNode.position.x + invisibleNode.size.width * 2,
+                    y: invisibleNode.position.y
+                )
+            }
+        }
+    }
+    
+    func clearInvisibleNodes(withName nodeName: String) {
+        enumerateChildNodes(withName: nodeName) { node, _ in
+            let invisibleNode = node as! SKSpriteNode
+            
+            if invisibleNode.position.x + invisibleNode.size.width < self.cameraRect.origin.x {
+                invisibleNode.removeFromParent()
+            }
+        }
+    }
     
     override func update(_ currentTime: TimeInterval) {
-        // Called before each frame is rendered
+        if lastUpdateTime > 0 {
+            dt = currentTime - lastUpdateTime
+        } else {
+            dt = 0
+        }
+        lastUpdateTime = currentTime
+        
+        move(sprite: player, velocity: CGPoint(x: playerMovePointsPerSec, y: 0))
+        
+        checkCollisions()
+        
+        moveCamera()
     }
 }
