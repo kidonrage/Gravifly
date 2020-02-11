@@ -22,6 +22,14 @@
 		E192103623F27B44005525E3 /* GameOverScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = E192103523F27B44005525E3 /* GameOverScene.swift */; };
 		E192103823F28002005525E3 /* MainMenuScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = E192103723F28002005525E3 /* MainMenuScene.swift */; };
 		E192103B23F2AB71005525E3 /* Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = E192103A23F2AB71005525E3 /* Button.swift */; };
+		E192103D23F2E694005525E3 /* shoot.wav in Resources */ = {isa = PBXBuildFile; fileRef = E192103C23F2E694005525E3 /* shoot.wav */; };
+		E192103F23F2E812005525E3 /* jump.wav in Resources */ = {isa = PBXBuildFile; fileRef = E192103E23F2E812005525E3 /* jump.wav */; };
+		E192104123F2E8A7005525E3 /* land.wav in Resources */ = {isa = PBXBuildFile; fileRef = E192104023F2E8A7005525E3 /* land.wav */; };
+		E192104323F2ED5E005525E3 /* pursuit.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E192104223F2ED5E005525E3 /* pursuit.mp3 */; };
+		E192104523F2F9F9005525E3 /* main-menu.wav in Resources */ = {isa = PBXBuildFile; fileRef = E192104423F2F9F8005525E3 /* main-menu.wav */; };
+		E192104723F2FD38005525E3 /* explosion.wav in Resources */ = {isa = PBXBuildFile; fileRef = E192104623F2FD37005525E3 /* explosion.wav */; };
+		E192104923F30204005525E3 /* playerhit.wav in Resources */ = {isa = PBXBuildFile; fileRef = E192104823F30204005525E3 /* playerhit.wav */; };
+		E192104C23F3095B005525E3 /* game-over.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E192104B23F3095B005525E3 /* game-over.mp3 */; };
 		E1A6B3B4232CE08F000C210E /* PlayerRunning.atlas in Resources */ = {isa = PBXBuildFile; fileRef = E1A6B3B3232CE08F000C210E /* PlayerRunning.atlas */; };
 		E1A6B3B6232CE3B3000C210E /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A6B3B5232CE3B3000C210E /* Player.swift */; };
 		E1A6B3BA232CEF87000C210E /* Background.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A6B3B9232CEF87000C210E /* Background.swift */; };
@@ -51,6 +59,14 @@
 		E192103523F27B44005525E3 /* GameOverScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameOverScene.swift; sourceTree = "<group>"; };
 		E192103723F28002005525E3 /* MainMenuScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenuScene.swift; sourceTree = "<group>"; };
 		E192103A23F2AB71005525E3 /* Button.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Button.swift; sourceTree = "<group>"; };
+		E192103C23F2E694005525E3 /* shoot.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = shoot.wav; sourceTree = "<group>"; };
+		E192103E23F2E812005525E3 /* jump.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = jump.wav; sourceTree = "<group>"; };
+		E192104023F2E8A7005525E3 /* land.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = land.wav; sourceTree = "<group>"; };
+		E192104223F2ED5E005525E3 /* pursuit.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = pursuit.mp3; sourceTree = "<group>"; };
+		E192104423F2F9F8005525E3 /* main-menu.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "main-menu.wav"; sourceTree = "<group>"; };
+		E192104623F2FD37005525E3 /* explosion.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = explosion.wav; sourceTree = "<group>"; };
+		E192104823F30204005525E3 /* playerhit.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = playerhit.wav; sourceTree = "<group>"; };
+		E192104B23F3095B005525E3 /* game-over.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "game-over.mp3"; sourceTree = "<group>"; };
 		E1A6B3B3232CE08F000C210E /* PlayerRunning.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; name = PlayerRunning.atlas; path = Gravifly/Player/PlayerRunning.atlas; sourceTree = SOURCE_ROOT; };
 		E1A6B3B5232CE3B3000C210E /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		E1A6B3B9232CEF87000C210E /* Background.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Background.swift; sourceTree = "<group>"; };
@@ -100,6 +116,7 @@
 		E12FAA57231CFCC8007B24F6 /* Gravifly */ = {
 			isa = PBXGroup;
 			children = (
+				E192104A23F305F5005525E3 /* Sounds */,
 				E192103923F2AB57005525E3 /* UI */,
 				E192103323F27894005525E3 /* 18523.ttf */,
 				E12BC30F2338507B004AB54E /* Buildings.atlas */,
@@ -137,6 +154,21 @@
 				E192103A23F2AB71005525E3 /* Button.swift */,
 			);
 			path = UI;
+			sourceTree = "<group>";
+		};
+		E192104A23F305F5005525E3 /* Sounds */ = {
+			isa = PBXGroup;
+			children = (
+				E192104B23F3095B005525E3 /* game-over.mp3 */,
+				E192104423F2F9F8005525E3 /* main-menu.wav */,
+				E192103E23F2E812005525E3 /* jump.wav */,
+				E192104223F2ED5E005525E3 /* pursuit.mp3 */,
+				E192104623F2FD37005525E3 /* explosion.wav */,
+				E192104823F30204005525E3 /* playerhit.wav */,
+				E192104023F2E8A7005525E3 /* land.wav */,
+				E192103C23F2E694005525E3 /* shoot.wav */,
+			);
+			path = Sounds;
 			sourceTree = "<group>";
 		};
 		E1A6B3C3232D2601000C210E /* Utils */ = {
@@ -221,14 +253,22 @@
 			files = (
 				E1A6B3B4232CE08F000C210E /* PlayerRunning.atlas in Resources */,
 				E12FAA64231CFCC9007B24F6 /* Main.storyboard in Resources */,
+				E192104323F2ED5E005525E3 /* pursuit.mp3 in Resources */,
 				E1FEB33E232E503A00421EFA /* PlayerJump.atlas in Resources */,
 				E1A6B3BE232D1CD8000C210E /* Assets.xcassets in Resources */,
 				E1FEB33C232E29B000421EFA /* PlayerRun.atlas in Resources */,
+				E192103F23F2E812005525E3 /* jump.wav in Resources */,
 				E192103423F27894005525E3 /* 18523.ttf in Resources */,
 				E1ED847C232F43D500B5B438 /* PlayerRunShoot.atlas in Resources */,
+				E192104123F2E8A7005525E3 /* land.wav in Resources */,
+				E192104C23F3095B005525E3 /* game-over.mp3 in Resources */,
+				E192103D23F2E694005525E3 /* shoot.wav in Resources */,
 				E12FAA69231CFCCC007B24F6 /* LaunchScreen.storyboard in Resources */,
 				E12BC3102338507B004AB54E /* Buildings.atlas in Resources */,
+				E192104523F2F9F9005525E3 /* main-menu.wav in Resources */,
 				E116203B233259E000D3D11C /* EnemyExplosion.atlas in Resources */,
+				E192104723F2FD38005525E3 /* explosion.wav in Resources */,
+				E192104923F30204005525E3 /* playerhit.wav in Resources */,
 				E138D62B23310732005E4DEA /* Shot.atlas in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

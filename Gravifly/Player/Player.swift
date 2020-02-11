@@ -68,8 +68,8 @@ class Player: SKSpriteNode {
         
         clearAnimation()
         
-        let jumpHeight: CGFloat = 400
-        let jumpDuration: TimeInterval = 0.8
+        let jumpHeight: CGFloat = 450
+        let jumpDuration: TimeInterval = 0.9
         let animateJump = SKAction.sequence([
             getAnimationAction(with: jumpingFrames),
             SKAction.run({ [weak self] in
@@ -83,12 +83,14 @@ class Player: SKSpriteNode {
             ])
         let moveDown = moveUp.reversed()
         let run = SKAction.run { [weak self] in
+            self?.run(SKAction.playSoundFileNamed("land.wav", waitForCompletion: false))
             self?.startRunning()
             self?.isJumping = false
         }
         
         isJumping = true
         self.run(SKAction.sequence([moveUpGroup, moveDown, run]))
+        self.run(SKAction.playSoundFileNamed("jump.wav", waitForCompletion: false))
     }
     
     func startShooting() {

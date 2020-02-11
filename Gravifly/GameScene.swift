@@ -8,6 +8,7 @@
 
 import SpriteKit
 import GameplayKit
+import AVFoundation
 
 class GameScene: SKScene {
     
@@ -39,6 +40,11 @@ class GameScene: SKScene {
             renderLives()
         }
     }
+    var availableShots = 10 {
+        didSet {
+            renderShots()
+        }
+    }
     var gameOver = false
     var isPlayerInvincible = false
     
@@ -56,6 +62,9 @@ class GameScene: SKScene {
     var velocity = CGPoint.zero
     
     let healthIndicator = SKNode()
+    let remainingShotsIndicator = SKNode()
+    
+    var backgroundMusicPlayer: AVAudioPlayer!
     
     override init(size: CGSize) {
         let maxAspectRatio: CGFloat = 2.16
@@ -63,9 +72,13 @@ class GameScene: SKScene {
         let playableMargin = (size.height - playableHeight) / 2.0
         playableRect = CGRect(x: 0, y: playableMargin, width: size.width, height: playableHeight)
         super.init(size: size)
-        gameTimer = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { timer in
+        gameTimer = Timer.scheduledTimer(withTimeInterval: 6.0, repeats: true) { timer in
             self.playerMovePointsPerSec += 10
+            if self.availableShots < 10 {
+                self.availableShots += 1
+            }
         }
+        
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -99,6 +112,26 @@ class GameScene: SKScene {
         cameraNode.position = CGPoint(x: size.width/2, y: size.height/2)
         
         renderLives()
+        renderShots()
+        
+        playBackgroundMusic(filename: "pursuit.mp3")
+    }
+    
+    func playBackgroundMusic(filename: String) {
+        let resourceUrl = Bundle.main.url(forResource: filename, withExtension: nil)
+        guard let url = resourceUrl else {
+            print("Could not find file: \(filename)")
+            return
+        }
+        do {
+            try backgroundMusicPlayer = AVAudioPlayer(contentsOf: url)
+            backgroundMusicPlayer.numberOfLoops = -1
+            backgroundMusicPlayer.prepareToPlay()
+            backgroundMusicPlayer.play()
+        } catch {
+            print("Could not create audio player!")
+            return
+        }
     }
     
     private func renderLives() {
@@ -111,13 +144,33 @@ class GameScene: SKScene {
             hpNode.setScale(4.0)
             
             hpNode.position = CGPoint(
-                x: hpNode.size.width * CGFloat(i) + 20,
+                x: hpNode.size.width * 1.2 * CGFloat(i),
                 y: 0
             )
             hpNode.zPosition = CGFloat(i)
             
             healthIndicator.addChild(hpNode)
         }
+    }
+    
+    private func renderShots() {
+        remainingShotsIndicator.removeAllChildren()
+        
+        for i in 0 ..< 10 {
+            let shotImageName = i < availableShots ? "fire-full" : "fire-empty"
+            
+            let shotNode = SKSpriteNode(imageNamed: shotImageName)
+            shotNode.setScale(5.0)
+            
+            shotNode.position = CGPoint(
+                x: shotNode.size.width * 1.5 * CGFloat(i),
+                y: 0
+            )
+            shotNode.zPosition = CGFloat(i)
+            
+            remainingShotsIndicator.addChild(shotNode)
+        }
+
     }
     
     private func startSpawning() {
@@ -141,7 +194,7 @@ class GameScene: SKScene {
         
         run(SKAction.repeatForever(
             SKAction.sequence([
-                SKAction.wait(forDuration: TimeInterval(2400.0 / playerMovePointsPerSec)),
+                SKAction.wait(forDuration: TimeInterval(1500.0 / playerMovePointsPerSec)),
                 SKAction.run() { [weak self] in
                     self?.spawnDrone()
                 }
@@ -163,10 +216,16 @@ class GameScene: SKScene {
         scoreLabel.zPosition = 100
         
         healthIndicator.position = CGPoint(
-            x: cameraRect.minX + 30,
-            y: cameraRect.maxY
+            x: cameraRect.minX + 60,
+            y: cameraRect.maxY - 60
         )
         cameraNode.addChild(healthIndicator)
+        
+        remainingShotsIndicator.position = CGPoint(
+            x: cameraRect.minX + 60,
+            y: cameraRect.maxY
+        )
+        cameraNode.addChild(remainingShotsIndicator)
     }
     
     func move(sprite: SKSpriteNode, velocity: CGPoint) {
@@ -212,6 +271,8 @@ class GameScene: SKScene {
         let disappear = SKAction.removeFromParent()
         
         enemy.run(SKAction.sequence([explode, disappear]))
+        
+        run(SKAction.playSoundFileNamed("explosion.wav", waitForCompletion: false))
     }
     
     func createRoof() {
@@ -318,6 +379,10 @@ class GameScene: SKScene {
     }
     
     @objc func tapHandler() {
+        guard availableShots >= 0 else {
+            return
+        }
+        
         player.startShooting()
         
         let shot = Shot();
@@ -331,6 +396,10 @@ class GameScene: SKScene {
         
         let moveLeft = SKAction.moveBy(x: playerMovePointsPerSec + 1000, y: 0, duration: 1.0)
         shot.run(SKAction.repeatForever(moveLeft))
+        run(SKAction.playSoundFileNamed("shoot.wav", waitForCompletion: false))
+        
+        availableShots -= 1
+        renderShots()
     }
     
     func debugDrawPlayableArea() {
@@ -342,16 +411,19 @@ class GameScene: SKScene {
     
     func getDamage() {
         lives -= 1
+        run(SKAction.playSoundFileNamed("playerhit.wav", waitForCompletion: false))
         
         if lives <= 0 && !gameOver {
             gameOver = true
-            print("You lose!")
+            
             let gameOverScene = GameOverScene(size: size)
             gameOverScene.scaleMode = scaleMode
             
-            let reveal = SKTransition.flipHorizontal(withDuration: 0.5)
+            let fade = SKTransition.fade(with: .white, duration: 0.5)
             
-            view?.presentScene(gameOverScene, transition: reveal)
+            view?.presentScene(gameOverScene, transition: fade)
+            
+            backgroundMusicPlayer.stop()
         } else {
             isPlayerInvincible = true
             

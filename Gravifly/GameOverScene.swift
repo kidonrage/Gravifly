@@ -12,6 +12,7 @@ import SpriteKit
 class GameOverScene: SKScene {
     
     override func didMove(to view: SKView) {
+        run(SKAction.playSoundFileNamed("game-over.mp3", waitForCompletion: false))
         addBackground()
         addButtons()
     }
@@ -26,6 +27,20 @@ class GameOverScene: SKScene {
         )
         
         addChild(background)
+        
+        let gameOverTexture = SKTexture(imageNamed: "gameover")
+        gameOverTexture.filteringMode = .nearest
+        
+        let gameOverLabel = SKSpriteNode(texture: gameOverTexture)
+        
+        gameOverLabel.setScale(10)
+        
+        gameOverLabel.position = CGPoint(
+            x: size.width / 2,
+            y: size.height / 2 + 200
+        )
+        
+        addChild(gameOverLabel)
     }
     
     private func addButtons() {
@@ -59,18 +74,18 @@ class GameOverScene: SKScene {
         let gameScene = GameScene(size: size)
         gameScene.size = size
         gameScene.scaleMode = scaleMode
-        let doorway = SKTransition.doorway(withDuration: 1.5)
+        let fade = SKTransition.fade(with: .purple, duration: 1.5)
         
-        view?.presentScene(gameScene, transition: doorway)
+        view?.presentScene(gameScene, transition: fade)
     }
     
     func goToMenu() {
         let menuScene = MainMenuScene(size: size)
         menuScene.size = size
         menuScene.scaleMode = scaleMode
-        let doorway = SKTransition.doorway(withDuration: 1.5)
+        let push = SKTransition.push(with: .right, duration: 1.5)
         
-        view?.presentScene(menuScene, transition: doorway)
+        view?.presentScene(menuScene, transition: push)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -90,7 +105,6 @@ class GameOverScene: SKScene {
             } else if nodeName == "menu-button" {
               goToMenu()
             }
-            
             
         }
     }

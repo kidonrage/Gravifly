@@ -8,13 +8,34 @@
 
 import Foundation
 import SpriteKit
+import AVFoundation
 
 class MainMenuScene: SKScene {
+    
+    var backgroundMusicPlayer: AVAudioPlayer!
     
     override func didMove(to view: SKView) {
         addBackground()
         addStartButton()
         addTitle()
+        playBackgroundMusic(filename: "main-menu.wav")
+    }
+    
+    func playBackgroundMusic(filename: String) {
+        let resourceUrl = Bundle.main.url(forResource: filename, withExtension: nil)
+        guard let url = resourceUrl else {
+            print("Could not find file: \(filename)")
+            return
+        }
+        do {
+            try backgroundMusicPlayer = AVAudioPlayer(contentsOf: url)
+            backgroundMusicPlayer.numberOfLoops = -1
+            backgroundMusicPlayer.prepareToPlay()
+            backgroundMusicPlayer.play()
+        } catch {
+            print("Could not create audio player!")
+            return
+        }
     }
     
     private func addTitle() {
@@ -63,9 +84,11 @@ class MainMenuScene: SKScene {
         let gameScene = GameScene(size: size)
         gameScene.size = size
         gameScene.scaleMode = scaleMode
-        let doorway = SKTransition.doorway(withDuration: 1.5)
+        let push = SKTransition.push(with: .left, duration: 1.0)
         
-        view?.presentScene(gameScene, transition: doorway)
+        view?.presentScene(gameScene, transition: push)
+        
+        backgroundMusicPlayer.stop()
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
