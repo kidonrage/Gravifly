@@ -12,6 +12,11 @@ class EnemyDrone: SKSpriteNode {
     init() {
         super.init(texture: SKTexture(image: UIImage(named: "drone")!), color: .white, size: CGSize(width: 200, height: 200))
         self.name = "enemyDrone"
+        
+//        drawDebugShape()
+    }
+    
+    private func drawDebugShape() {
         let debugShape = SKShapeNode(rect: CGRect(origin: CGPoint(x: -100, y: -100), size: CGSize(width: 200, height: 200)))
         debugShape.strokeColor = .red
         debugShape.lineWidth = 4.0

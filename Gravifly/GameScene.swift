@@ -203,13 +203,12 @@ class GameScene: SKScene {
         drone.run(SKAction.sequence([actionMove, actionRemove]))
     }
     
-    
     func shotHit(enemy: SKSpriteNode) {
         score += 1
         playerMovePointsPerSec += 100
         
         let explosionFrames = getFramesFromAtlas(atlasName: "EnemyExplosion", singleTextureName: "enemy-explosion")
-        let explode = getAnimationAction(with: explosionFrames)
+        let explode = getAnimationAction(with: explosionFrames, isRestore: false)
         let disappear = SKAction.removeFromParent()
         
         enemy.run(SKAction.sequence([explode, disappear]))

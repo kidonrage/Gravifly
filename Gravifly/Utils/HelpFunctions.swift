@@ -21,11 +21,11 @@ func getFramesFromAtlas(atlasName: String, singleTextureName: String) -> [SKText
     return frames
 }
 
-func getAnimationAction(with frames: [SKTexture]) -> SKAction {
+func getAnimationAction(with frames: [SKTexture], isRestore: Bool = true) -> SKAction {
     return SKAction.animate(
         with: frames,
         timePerFrame: 0.1,
         resize: false,
-        restore: true
+        restore: isRestore
     )
 }
