@@ -34,7 +34,11 @@ class GameScene: SKScene {
             scoreLabel.text = "Score: \(score)"
         }
     }
-    var lives = 3
+    var lives = 3 {
+        didSet {
+            renderLives()
+        }
+    }
     var gameOver = false
     var isPlayerInvincible = false
     
@@ -50,6 +54,8 @@ class GameScene: SKScene {
         }
     }
     var velocity = CGPoint.zero
+    
+    let healthIndicator = SKNode()
     
     override init(size: CGSize) {
         let maxAspectRatio: CGFloat = 2.16
@@ -91,6 +97,27 @@ class GameScene: SKScene {
         addChild(cameraNode)
         camera = cameraNode
         cameraNode.position = CGPoint(x: size.width/2, y: size.height/2)
+        
+        renderLives()
+    }
+    
+    private func renderLives() {
+        healthIndicator.removeAllChildren()
+        
+        for i in 0 ..< 3 {
+            let hpImageName = i < lives ? "hp_full" : "hp_empty"
+            
+            let hpNode = SKSpriteNode(imageNamed: hpImageName)
+            hpNode.setScale(4.0)
+            
+            hpNode.position = CGPoint(
+                x: hpNode.size.width * CGFloat(i) + 20,
+                y: 0
+            )
+            hpNode.zPosition = CGFloat(i)
+            
+            healthIndicator.addChild(hpNode)
+        }
     }
     
     private func startSpawning() {
@@ -129,10 +156,17 @@ class GameScene: SKScene {
         scoreLabel.fontColor = .white
         scoreLabel.position = CGPoint(
             x: cameraRect.maxX - scoreLabel.frame.width / 2 - 30,
-            y: cameraRect.maxY - 30)
+            y: cameraRect.maxY - 30
+        )
         
         cameraNode.addChild(scoreLabel)
         scoreLabel.zPosition = 100
+        
+        healthIndicator.position = CGPoint(
+            x: cameraRect.minX + 30,
+            y: cameraRect.maxY
+        )
+        cameraNode.addChild(healthIndicator)
     }
     
     func move(sprite: SKSpriteNode, velocity: CGPoint) {
