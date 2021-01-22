@@ -45,7 +45,7 @@ class Player: SKSpriteNode {
             x: velocity.x * CGFloat(dt),
             y: velocity.y * CGFloat(dt)
         )
-        print("Amount to move: \(amountToMove)")
+        
         self.position = CGPoint(
             x: self.position.x + amountToMove.x,
             y: self.position.y + amountToMove.y

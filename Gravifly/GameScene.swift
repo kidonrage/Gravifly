@@ -228,49 +228,49 @@ class GameScene: SKScene {
         cameraNode.addChild(remainingShotsIndicator)
     }
     
-    func move(sprite: SKSpriteNode, velocity: CGPoint) {
-        let amountToMove = CGPoint(
-            x: velocity.x * CGFloat(dt),
-            y: velocity.y * CGFloat(dt)
-        )
-        
-        sprite.position = CGPoint(
-            x: sprite.position.x + amountToMove.x,
-            y: sprite.position.y + amountToMove.y
-        )
-    }
-    
     func spawnDrone() {
         let drone = EnemyDrone()
         
-        drone.position = CGPoint(
-            x: cameraRect.maxX + drone.size.width / 2,
-            y: CGFloat.random(
-                min: cameraRect.minY + drone.size.height / 2,
-                max: cameraRect.maxY - 200 - drone.size.height / 2))
+        let dronSpawnX = cameraRect.maxX + drone.size.width / 2
+        let possibleDronPositions: [CGPoint] = [
+            CGPoint(
+                x: dronSpawnX,
+                y: cameraRect.minY + drone.size.height / 2 + 10
+            ),
+            CGPoint(
+                x: dronSpawnX,
+                y: cameraRect.minY + player.size.height
+            ),
+            CGPoint(
+                x: dronSpawnX,
+                y: cameraRect.minY + player.size.height + drone.size.height
+            )
+        ]
+        
+        let dronDataIndex = Int.random(in: 0..<possibleDronPositions.count)
+        drone.position = possibleDronPositions[dronDataIndex]
         drone.zPosition = player.zPosition
         addChild(drone)
         
         let amountToMove = frame.size.width + drone.size.width
         
-        let minTime = TimeInterval(amountToMove / (playerMovePointsPerSec))
-        let maxTime = TimeInterval(amountToMove / (playerMovePointsPerSec - 200))
+        let possibleDronSpeeds: [TimeInterval] = [
+            TimeInterval(amountToMove / (playerMovePointsPerSec + 400)),
+            TimeInterval(amountToMove / playerMovePointsPerSec),
+            TimeInterval(amountToMove / (playerMovePointsPerSec + 1000))
+        ]
         
-        let actionMove = SKAction.moveBy(x: -amountToMove, y: 0, duration: TimeInterval.random(in: minTime...maxTime))
+        let actionMove = SKAction.moveBy(x: -amountToMove, y: 0, duration: possibleDronSpeeds[dronDataIndex])
         let actionRemove = SKAction.removeFromParent()
         
         drone.run(SKAction.sequence([actionMove, actionRemove]))
     }
     
-    func shotHit(enemy: SKSpriteNode) {
+    func shotHit(enemy: EnemyDrone) {
         score += 1
         playerMovePointsPerSec += 100
         
-        let explosionFrames = getFramesFromAtlas(atlasName: "EnemyExplosion", singleTextureName: "enemy-explosion")
-        let explode = getAnimationAction(with: explosionFrames, isRestore: false)
-        let disappear = SKAction.removeFromParent()
-        
-        enemy.run(SKAction.sequence([explode, disappear]))
+        enemy.die()
         
         run(SKAction.playSoundFileNamed("explosion.wav", waitForCompletion: false))
     }
@@ -446,11 +446,11 @@ class GameScene: SKScene {
     }
     
     func checkCollisions() {
-        var hitDrones: [SKSpriteNode] = []
+        var hitDrones: [EnemyDrone] = []
         enumerateChildNodes(withName: "enemyDrone") { (node, _) in
-            let drone = node as! SKSpriteNode
+            let drone = node as! EnemyDrone
             
-            if (!self.isPlayerInvincible && drone.frame.insetBy(dx: 40, dy: 40).intersects(self.player.frame)) {
+            if (!self.isPlayerInvincible && drone.frame.insetBy(dx: 80, dy: 50).intersects(self.player.frame)) {
                 self.getDamage()
             }
             
@@ -464,7 +464,7 @@ class GameScene: SKScene {
         }
         
         for drone in hitDrones {
-            shotHit(enemy: drone)
+            shotHit(enemy: drone )
         }
         
     }
@@ -527,7 +527,7 @@ class GameScene: SKScene {
         }
         lastUpdateTime = currentTime
         
-        move(sprite: player, velocity: CGPoint(x: playerMovePointsPerSec, y: 0))
+        player.move(velocity: CGPoint(x: playerMovePointsPerSec, y: 0), dt: dt)
         
         checkCollisions()
         

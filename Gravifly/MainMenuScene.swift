@@ -84,9 +84,9 @@ class MainMenuScene: SKScene {
         let gameScene = GameScene(size: size)
         gameScene.size = size
         gameScene.scaleMode = scaleMode
-        let push = SKTransition.push(with: .left, duration: 1.0)
+        let fade = SKTransition.fade(with: .purple, duration: 1.0)
         
-        view?.presentScene(gameScene, transition: push)
+        view?.presentScene(gameScene, transition: fade)
         
         backgroundMusicPlayer.stop()
     }

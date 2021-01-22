@@ -28,6 +28,10 @@ class EnemyDrone: SKSpriteNode {
     }
     
     func die() {
-        self.removeFromParent()
+        let explosionFrames = getFramesFromAtlas(atlasName: "EnemyExplosion", singleTextureName: "enemy-explosion")
+        let explode = getAnimationAction(with: explosionFrames, isRestore: false)
+        let disappear = SKAction.removeFromParent()
+        
+        self.run(SKAction.sequence([explode, disappear]))
     }
 }
